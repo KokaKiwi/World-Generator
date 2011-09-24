@@ -20,7 +20,7 @@ public class PlainBiome extends Biome
         HeightMap heightmap = generator.getEnvironment().getParameter(HeightMap.class);
         double h = heightmap.getValue(x, y);
         
-        if(h < 0.5)
+        if(h <= 0.7)
         {
             return true;
         }

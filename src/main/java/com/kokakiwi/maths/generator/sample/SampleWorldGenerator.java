@@ -27,7 +27,7 @@ public class SampleWorldGenerator
 {
     private WorldGenerator       generator;
     
-    private final static double  zoom         = 1.5;
+    private final static double  zoom         = 5.3;
     private final static int     width        = 1024;
     private final static int     height       = 1024;
     
@@ -61,6 +61,7 @@ public class SampleWorldGenerator
         generator.registerBiome(OceanBiome.class);
         generator.registerBiome(RiverBiome.class);
         generator.registerBiome(DesertBiome.class);
+        generator.registerBiome(ForestBiome.class);
         generator.registerBiome(PlainBiome.class);
         generator.registerBiome(MountainBiome.class);
         

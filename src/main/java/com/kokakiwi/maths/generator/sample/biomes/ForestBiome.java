@@ -3,13 +3,14 @@ package com.kokakiwi.maths.generator.sample.biomes;
 import java.awt.Color;
 
 import com.kokakiwi.maths.generator.sample.params.HeightMap;
+import com.kokakiwi.maths.generator.sample.params.Temperature;
 import com.kokakiwi.maths.generator.world.WorldGenerator;
 import com.kokakiwi.maths.generator.world.gen.Biome;
 
-public class MountainBiome extends Biome
+public class ForestBiome extends Biome
 {
     
-    public MountainBiome(WorldGenerator generator)
+    public ForestBiome(WorldGenerator generator)
     {
         super(generator);
     }
@@ -17,11 +18,10 @@ public class MountainBiome extends Biome
     @Override
     public boolean check(double x, double y)
     {
-        HeightMap heightmap = generator.getEnvironment().getParameter(
-                HeightMap.class);
-        double h = heightmap.getValue(x, y);
+        double height = getValue(HeightMap.class, x, y);
+        double temperature = getValue(Temperature.class, x, y);
         
-        if (h > 0.7)
+        if (height > 0.1 && temperature > 35 && temperature < 50)
         {
             return true;
         }
@@ -34,7 +34,7 @@ public class MountainBiome extends Biome
     {
         if (check(x, y))
         {
-            return Color.lightGray;
+            return Color.red;
         }
         
         return null;
