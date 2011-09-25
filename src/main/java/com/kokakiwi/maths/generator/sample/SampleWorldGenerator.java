@@ -27,7 +27,7 @@ public class SampleWorldGenerator implements KeyListener
 {
     private WorldGenerator        generator;
     
-    private static double         zoom         = 5.0;
+    private static double         zoom         = 3.0;
     private static int            width        = 1024;
     private static int            height       = 1024;
     
@@ -60,6 +60,7 @@ public class SampleWorldGenerator implements KeyListener
         
         // On inscrit les biomes
         generator.registerBiome(OceanBiome.class);
+        generator.registerBiome(SnowBiome.class);
         generator.registerBiome(RiverBiome.class);
         generator.registerBiome(LakeBiome.class);
         generator.registerBiome(VolcanoBiome.class);
@@ -74,6 +75,7 @@ public class SampleWorldGenerator implements KeyListener
         generator.getEnvironment().registerParameter(Temperature.class);
         generator.getEnvironment().registerParameter(Oasis.class);
         generator.getEnvironment().registerParameter(Volcano.class);
+        generator.getEnvironment().registerParameter(Snow.class);
         
         // On cree l'image
         BufferedImage image = createImage();

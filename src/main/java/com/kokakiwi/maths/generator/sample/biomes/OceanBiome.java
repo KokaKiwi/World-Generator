@@ -10,27 +10,30 @@ import com.kokakiwi.maths.generator.world.gen.Biome;
 
 public class OceanBiome extends Biome
 {
+    public final static double WATER_HEIGHT = 0.13;
     
     public OceanBiome(WorldGenerator generator)
     {
         super(generator);
     }
-
+    
     @Override
     public boolean check(double x, double y)
     {
-        HeightMap heightmap = generator.getEnvironment().getParameter(HeightMap.class);
+        HeightMap heightmap = generator.getEnvironment().getParameter(
+                HeightMap.class);
         double h = heightmap.getValue(x, y);
-        Temperature temperatures = generator.getEnvironment().getParameter(Temperature.class);
+        Temperature temperatures = generator.getEnvironment().getParameter(
+                Temperature.class);
         double temperature = temperatures.getValue(x, y);
         double o = getValue(Oasis.class, x, y);
         
-        if(h < 0.13)
+        if (h < WATER_HEIGHT)
         {
             return true;
         }
         
-        if(temperature > 65 && o > 0.5)
+        if (temperature > 65 && o > 0.5)
         {
             return true;
         }
@@ -41,7 +44,7 @@ public class OceanBiome extends Biome
     @Override
     public Color getColor(double x, double y)
     {
-        if(check(x, y))
+        if (check(x, y))
         {
             return Color.blue;
         }
