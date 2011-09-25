@@ -23,8 +23,7 @@ public class OceanBiome extends Biome
         double h = heightmap.getValue(x, y);
         Temperature temperatures = generator.getEnvironment().getParameter(Temperature.class);
         double temperature = temperatures.getValue(x, y);
-        Oasis oasis = generator.getEnvironment().getParameter(Oasis.class);
-        double o = oasis.getValue(x, y);
+        double o = getValue(Oasis.class, x, y);
         
         if(h < 0.13)
         {

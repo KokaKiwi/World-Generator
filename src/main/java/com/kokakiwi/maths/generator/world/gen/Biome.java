@@ -29,6 +29,12 @@ public abstract class Biome
         return generator.getEnvironment().getParameter(clazz);
     }
     
+    @SuppressWarnings("unchecked")
+    protected <T extends Biome> T getBiome(Class<T> clazz)
+    {
+        return (T) generator.getBiomes().get(clazz);
+    }
+    
     public abstract boolean check(double x, double y);
     
     public abstract Color getColor(double x, double y);

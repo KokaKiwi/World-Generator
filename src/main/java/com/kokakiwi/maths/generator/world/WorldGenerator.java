@@ -2,17 +2,19 @@ package com.kokakiwi.maths.generator.world;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.kokakiwi.maths.generator.world.env.Environment;
-import com.kokakiwi.maths.generator.world.env.Parameter;
 import com.kokakiwi.maths.generator.world.gen.Biome;
 
 public class WorldGenerator
 {
-    private final String      seed;
-    private final Environment environment;
-    private final List<Biome> biomes = new ArrayList<Biome>();
+    private final String                             seed;
+    private final Environment                        environment;
+    private final Map<Class<? extends Biome>, Biome> biomes   = new HashMap<Class<? extends Biome>, Biome>();
+    private final List<Class<? extends Biome>>       priority = new ArrayList<Class<? extends Biome>>();
     
     public WorldGenerator(String seed)
     {
@@ -30,17 +32,24 @@ public class WorldGenerator
         return environment;
     }
     
-    public List<Biome> getBiomes()
+    public Map<Class<? extends Biome>, Biome> getBiomes()
     {
         return biomes;
+    }
+    
+    public List<Class<? extends Biome>> getPriority()
+    {
+        return priority;
     }
     
     public Biome getBiome(double x, double y)
     {
         Biome result = null;
         
-        for (Biome biome : biomes)
+        for (Class<? extends Biome> clazz : priority)
         {
+            Biome biome = biomes.get(clazz);
+            
             if (result == null)
             {
                 if (biome.check(x, y))
@@ -70,6 +79,7 @@ public class WorldGenerator
     
     public <T extends Biome> void registerBiome(T biome)
     {
-        biomes.add(biome);
+        biomes.put(biome.getClass(), biome);
+        priority.add(biome.getClass());
     }
 }
