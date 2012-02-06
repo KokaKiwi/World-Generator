@@ -2,6 +2,6 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.kokakiwi.maths.generator</groupId>
   <artifactId>world-generator</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
   <name>World Generator</name>
+  <version>0.1.0</version>
 </project>
