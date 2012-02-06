@@ -31,4 +31,19 @@ public class MathsHelper
         
         return value;
     }
+    
+    public static float supervise(float value, float min, float max)
+    {
+        if (value > max)
+        {
+            value = max;
+        }
+        
+        if (value < min)
+        {
+            value = min;
+        }
+        
+        return value;
+    }
 }
