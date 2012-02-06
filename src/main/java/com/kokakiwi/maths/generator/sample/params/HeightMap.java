@@ -15,7 +15,7 @@ public class HeightMap extends Parameter
     {
         double result = 0.0;
         
-        result += noise.fBm(0.0009 * x, 0.0009 * y, 0.0009 * z, 5, 2.2341,
+        result += noise.fBm(0.0009 * x, 0.0009 * y, 0.0009 * z, 50, 2.2341,
                 1.422561) + 0.4;
         
         return result;

@@ -27,9 +27,9 @@ public class SampleWorldGenerator implements KeyListener
 {
     private WorldGenerator        generator;
     
-    private static double         zoom         = 3.0;
-    private static int            width        = 1024;
-    private static int            height       = 1024;
+    private static double         zoom         = 15.0;
+    private static int            width        = 128;
+    private static int            height       = 128;
     
     private static double         startX       = 0.0;
     private static double         startY       = 0.0;
@@ -37,10 +37,10 @@ public class SampleWorldGenerator implements KeyListener
     public final static int       windowWidth  = 800;
     public final static int       windowHeight = 800;
     
-    private static boolean        showDensity  = true;
+    private static boolean        showDensity  = false;
     private static String         densityName  = "heightmap";
     
-    private static String         defaultSeed  = "123456789";
+    private static String         defaultSeed  = "kjdsnbdsk;bhjbjfdh";
     
     private static BufferedImage  renderingImage;
     private static WorldComponent renderer;
