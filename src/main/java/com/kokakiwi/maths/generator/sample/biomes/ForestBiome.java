@@ -36,7 +36,7 @@ public class ForestBiome extends Biome
     {
         if (check(x, y))
         {
-            return Color.red;
+            return Color.green.darker().darker();
         }
         
         return null;

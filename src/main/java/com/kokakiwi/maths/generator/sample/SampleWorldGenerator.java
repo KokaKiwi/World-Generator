@@ -27,9 +27,9 @@ public class SampleWorldGenerator implements KeyListener
 {
     private WorldGenerator        generator;
     
-    private static double         zoom         = 15.0;
-    private static int            width        = 128;
-    private static int            height       = 128;
+    private static double         zoom         = 1.0;
+    private static int            width        = 512;
+    private static int            height       = 512;
     
     private static double         startX       = 0.0;
     private static double         startY       = 0.0;
