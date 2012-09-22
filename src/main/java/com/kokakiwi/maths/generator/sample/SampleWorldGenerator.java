@@ -27,30 +27,30 @@ public class SampleWorldGenerator implements KeyListener
 {
     private WorldGenerator        generator;
     
-    private static double         zoom         = 1.0;
-    private static int            width        = 512;
-    private static int            height       = 512;
+    private static double         zoom           = 1.0;
+    private static int            width          = 1024;
+    private static int            height         = 1024;
     
-    private static double         startX       = 0.0;
-    private static double         startY       = 0.0;
+    private static double         startX         = 0.0;
+    private static double         startY         = 0.0;
     
-    public final static int       windowWidth  = 800;
-    public final static int       windowHeight = 800;
+    public final static int       windowWidth    = 1024;
+    public final static int       windowHeight   = 1024;
     
-    private static boolean        showDensity  = false;
-    private static String         densityName  = "heightmap";
+    private static boolean        showDensity    = false;
+    private static String         densityName    = "heightmap";
     
-    private static String         defaultSeed  = "kjdsnbdsk;bhjbjfdh";
+    private static boolean        useDefaultSeed = true;
+    private static String         defaultSeed    = "kjdsnbdsk;bhjbjfdh";
     
     private static BufferedImage  renderingImage;
     private static WorldComponent renderer;
     
-    @SuppressWarnings("unused")
     public SampleWorldGenerator()
     {
         // On definit le seed
         String seed = defaultSeed;
-        if (seed == null)
+        if (useDefaultSeed)
         {
             seed = new FastRandom().randomCharacterString(13);
         }
@@ -100,6 +100,10 @@ public class SampleWorldGenerator implements KeyListener
                 BufferedImage.TYPE_INT_RGB);
         Graphics2D g = image.createGraphics();
         
+        int count = 0;
+        int level = 10;
+        int max = width * height;
+        
         for (int x = -(width / 2); x < (width / 2); x++)
         {
             for (int y = -(height / 2); y < (height / 2); y++)
@@ -131,6 +135,14 @@ public class SampleWorldGenerator implements KeyListener
                 
                 g.setColor(color);
                 g.fillRect(x + (width / 2), y + (height / 2), 1, 1);
+                
+                count++;
+                
+                if ((count * 100 / max) >= level)
+                {
+                    System.out.println(level + "%");
+                    level += 10;
+                }
                 
                 for (Parameter param : generator.getEnvironment()
                         .getParameters().values())
