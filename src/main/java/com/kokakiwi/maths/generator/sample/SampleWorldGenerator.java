@@ -2,82 +2,93 @@ package com.kokakiwi.maths.generator.sample;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.Graphics2D;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+import javax.swing.JFrame;
+import javax.swing.JProgressBar;
 
-import com.kokakiwi.maths.generator.sample.biomes.*;
-import com.kokakiwi.maths.generator.sample.params.*;
+import com.kokakiwi.maths.generator.sample.biomes.DesertBiome;
+import com.kokakiwi.maths.generator.sample.biomes.ForestBiome;
+import com.kokakiwi.maths.generator.sample.biomes.LakeBiome;
+import com.kokakiwi.maths.generator.sample.biomes.MountainBiome;
+import com.kokakiwi.maths.generator.sample.biomes.OceanBiome;
+import com.kokakiwi.maths.generator.sample.biomes.PlainBiome;
+import com.kokakiwi.maths.generator.sample.biomes.RiverBiome;
+import com.kokakiwi.maths.generator.sample.biomes.SnowBiome;
+import com.kokakiwi.maths.generator.sample.biomes.VolcanoBiome;
+import com.kokakiwi.maths.generator.world.Tile;
+import com.kokakiwi.maths.generator.world.World;
 import com.kokakiwi.maths.generator.world.WorldGenerator;
 import com.kokakiwi.maths.generator.world.env.Parameter;
-import com.kokakiwi.maths.generator.world.gen.Biome;
+import com.kokakiwi.maths.generator.world.event.WorldGenListener;
+import com.kokakiwi.maths.generator.world.utils.Coordinates;
 import com.kokakiwi.maths.generator.world.utils.FastRandom;
 import com.kokakiwi.maths.generator.world.utils.MathsHelper;
 
-public class SampleWorldGenerator implements KeyListener
+public class SampleWorldGenerator implements WorldGenListener
 {
-    private WorldGenerator        generator;
+    private final WorldGenerator generator;
     
-    private static double         zoom           = 1.0;
-    private static int            width          = 1024;
-    private static int            height         = 1024;
+    private static int           chunkWidth     = 512;
+    private static int           chunkHeight    = 512;
     
-    private static double         startX         = 0.0;
-    private static double         startY         = 0.0;
+    private static double        zoom           = 1.0;
+    private static int           width          = 12;
+    private static int           height         = 12;
     
-    public final static int       windowWidth    = 1024;
-    public final static int       windowHeight   = 1024;
+    private static Coordinates   origin         = new Coordinates(
+                                                        -15 * chunkWidth,
+                                                        0 * chunkHeight);
     
-    private static boolean        showDensity    = false;
-    private static String         densityName    = "heightmap";
+    public final static int      windowWidth    = 512;
+    public final static int      windowHeight   = 512;
     
-    private static boolean        useDefaultSeed = true;
-    private static String         defaultSeed    = "kjdsnbdsk;bhjbjfdh";
+    private static boolean       showDensity    = false;
+    private static String        densityName    = "temperature";
     
-    private static BufferedImage  renderingImage;
-    private static WorldComponent renderer;
+    private static boolean       useDefaultSeed = true;
+    private static String        defaultSeed    = "blkablsmsqs6sq+ssq-s-/8";
+    
+    private JFrame               progressFrame;
+    
+    private int                  chunkCount     = 0;
+    private JProgressBar         chunkProgressBar;
+    
+    private int                  count          = 0;
+    private JProgressBar         mainProgressBar;
     
     public SampleWorldGenerator()
     {
-        // On definit le seed
         String seed = defaultSeed;
-        if (useDefaultSeed)
+        if (!useDefaultSeed)
         {
             seed = new FastRandom().randomCharacterString(13);
         }
         
-        // On initialise le generateur
+        initProgress();
+        
         generator = new WorldGenerator(seed);
         
+        generator.setAutoParamRegister(true);
+        generator.setEventsEnabled(true);
+        
+        generator.addListener(this);
+        
         // On inscrit les biomes
-        generator.registerBiome(OceanBiome.class);
-        generator.registerBiome(SnowBiome.class);
-        generator.registerBiome(RiverBiome.class);
-        generator.registerBiome(LakeBiome.class);
-        generator.registerBiome(VolcanoBiome.class);
-        generator.registerBiome(DesertBiome.class);
-        generator.registerBiome(ForestBiome.class);
-        generator.registerBiome(PlainBiome.class);
         generator.registerBiome(MountainBiome.class);
+        generator.registerBiome(PlainBiome.class);
+        generator.registerBiome(ForestBiome.class);
+        generator.registerBiome(DesertBiome.class);
+        generator.registerBiome(VolcanoBiome.class);
+        generator.registerBiome(LakeBiome.class);
+        generator.registerBiome(RiverBiome.class);
+        generator.registerBiome(SnowBiome.class);
+        generator.registerBiome(OceanBiome.class);
         
-        // On inscrit les variables d'environnement
-        generator.getEnvironment().registerParameter(HeightMap.class);
-        generator.getEnvironment().registerParameter(Rivers.class);
-        generator.getEnvironment().registerParameter(Temperature.class);
-        generator.getEnvironment().registerParameter(Oasis.class);
-        generator.getEnvironment().registerParameter(Volcano.class);
-        generator.getEnvironment().registerParameter(Snow.class);
-        
-        // On cree l'image
         BufferedImage image = createImage();
         try
         {
@@ -88,113 +99,100 @@ public class SampleWorldGenerator implements KeyListener
             e.printStackTrace();
         }
         
-        renderingImage = image;
-        showWindow();
+        System.exit(0);
     }
     
     public BufferedImage createImage()
     {
-        long start = System.currentTimeMillis();
-        
-        BufferedImage image = new BufferedImage(width, height,
-                BufferedImage.TYPE_INT_RGB);
+        BufferedImage image = new BufferedImage(width * chunkWidth, height
+                * chunkHeight, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = image.createGraphics();
         
-        int count = 0;
-        int level = 10;
-        int max = width * height;
+        World chunk;
         
-        for (int x = -(width / 2); x < (width / 2); x++)
+        showProgress();
+        
+        for (int cx = 0; cx < width; cx++)
         {
-            for (int y = -(height / 2); y < (height / 2); y++)
+            for (int cy = 0; cy < height; cy++)
             {
-                Biome biome = generator.getBiome(x * zoom + startX, y * zoom
-                        + startY);
-                Color color = Color.black;
+                chunkCount = 0;
+                chunk = generator.generateWorld(
+                        origin.getRelative(cx * chunkWidth * zoom, cy
+                                * chunkHeight * zoom), chunkWidth, chunkHeight,
+                        zoom);
                 
-                if (biome != null)
+                Tile[][] tiles = chunk.getTiles();
+                for (int x = 0; x < chunkWidth; x++)
                 {
-                    color = biome
-                            .getColor(x * zoom + startX, y * zoom + startY);
-                    
-                    if (showDensity)
+                    for (int y = 0; y < chunkHeight; y++)
                     {
-                        Parameter param = generator.getEnvironment()
-                                .getParameter(densityName);
-                        double value = param.getValue(x * zoom + startX, y
-                                * zoom + startY);
-                        value = MathsHelper.supervise(value, 0.2, 1.0);
+                        Tile tile = tiles[x][y];
+                        Color color = Color.black;
                         
-                        int red = (int) (color.getRed() * value);
-                        int green = (int) (color.getGreen() * value);
-                        int blue = (int) (color.getBlue() * value);
+                        if (tile.getSingleProperty("color") != null)
+                        {
+                            color = tile.getSingleProperty("color");
+                        }
                         
-                        color = new Color(red, green, blue);
+                        if (showDensity)
+                        {
+                            Parameter param = generator
+                                    .getParameter(densityName);
+                            double value = param.getValue(tile.getX(),
+                                    tile.getY());
+                            value = MathsHelper.supervise(value, 0.2, 1.0);
+                            
+                            int red = (int) (color.getRed() * value);
+                            int green = (int) (color.getGreen() * value);
+                            int blue = (int) (color.getBlue() * value);
+                            
+                            color = new Color(red, green, blue);
+                            
+                            param.reset();
+                        }
+                        
+                        g.setColor(color);
+                        g.fillRect(cx * chunkWidth + x, cy * chunkHeight + y,
+                                1, 1);
                     }
                 }
                 
-                g.setColor(color);
-                g.fillRect(x + (width / 2), y + (height / 2), 1, 1);
-                
                 count++;
-                
-                if ((count * 100 / max) >= level)
-                {
-                    System.out.println(level + "%");
-                    level += 10;
-                }
-                
-                for (Parameter param : generator.getEnvironment()
-                        .getParameters().values())
-                {
-                    param.reset();
-                }
+                mainProgressBar.setValue(count);
             }
         }
         
-        long end = System.currentTimeMillis();
-        double diff = (end - start) / 1000;
-        double speed = diff / (width * height) * (64 * 64);
-        System.out.println("Process time: " + diff + " s");
-        System.out.println("Speed: " + speed + " s per chunks of 64*64 blocs");
+        hideProgress();
         
         return image;
     }
     
-    public void showWindow()
+    public void initProgress()
     {
-        final Frame frame = new Frame("Perlin World");
-        renderer = new WorldComponent(renderingImage);
-        frame.setPreferredSize(new Dimension(windowWidth, windowHeight));
-        frame.setLayout(new BorderLayout());
-        frame.setResizable(false);
-        frame.addKeyListener(this);
-        frame.add(renderer, "Center");
-        frame.addWindowListener(new WindowAdapter() {
-            
-            @Override
-            public void windowClosing(WindowEvent e)
-            {
-                frame.dispose();
-                System.exit(0);
-            }
-        });
-        frame.pack();
-        frame.setVisible(true);
+        progressFrame = new JFrame("Progress...");
+        progressFrame.setLayout(new BorderLayout());
+        progressFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        progressFrame.setResizable(false);
         
-        while (true)
-        {
-            frame.repaint();
-            renderer.repaint();
-            try
-            {
-                Thread.sleep(1000L);
-            }
-            catch (InterruptedException e1)
-            {
-                e1.printStackTrace();
-            }
-        }
+        mainProgressBar = new JProgressBar(0, width * height);
+        progressFrame.add(mainProgressBar, BorderLayout.NORTH);
+        
+        chunkProgressBar = new JProgressBar(0, chunkWidth * chunkHeight);
+        progressFrame.add(chunkProgressBar, BorderLayout.SOUTH);
+        
+        progressFrame.pack();
+        progressFrame.setLocationRelativeTo(null);
+    }
+    
+    public void showProgress()
+    {
+        progressFrame.setVisible(true);
+    }
+    
+    public void hideProgress()
+    {
+        progressFrame.setVisible(false);
     }
     
     public static void main(String[] args)
@@ -202,41 +200,10 @@ public class SampleWorldGenerator implements KeyListener
         new SampleWorldGenerator();
     }
     
-    public void keyTyped(KeyEvent e)
+    public void tileProcessed(Tile tile)
     {
+        chunkCount++;
         
+        chunkProgressBar.setValue(chunkCount);
     }
-    
-    public void keyPressed(KeyEvent e)
-    {
-        
-    }
-    
-    public void keyReleased(KeyEvent e)
-    {
-        if (e.getKeyCode() == KeyEvent.VK_RIGHT)
-        {
-            startX += width / 2;
-            renderer.setImage(createImage());
-        }
-        
-        if (e.getKeyCode() == KeyEvent.VK_LEFT)
-        {
-            startX -= width / 2;
-            renderer.setImage(createImage());
-        }
-        
-        if (e.getKeyCode() == KeyEvent.VK_UP)
-        {
-            startY -= height / 2;
-            renderer.setImage(createImage());
-        }
-        
-        if (e.getKeyCode() == KeyEvent.VK_DOWN)
-        {
-            startY += height / 2;
-            renderer.setImage(createImage());
-        }
-    }
-    
 }

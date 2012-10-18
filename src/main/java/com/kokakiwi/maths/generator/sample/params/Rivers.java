@@ -13,7 +13,7 @@ public class Rivers extends Parameter
     @Override
     public double value(double x, double y, double z)
     {
-        double h = noise.fBm(x * 0.01, 0.01 * y, 0.01 * (z + 1), 3, 2.1836171, 0.9631);
+        double h = noise.fBm(x * 0.001, 0.001 * y, 0.001 * (z + 1), 3, 2.1836171, 0.9631);
         h = Math.sqrt(Math.abs(h));
         return h;
     }

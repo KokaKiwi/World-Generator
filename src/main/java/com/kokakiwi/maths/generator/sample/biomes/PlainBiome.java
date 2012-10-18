@@ -3,8 +3,9 @@ package com.kokakiwi.maths.generator.sample.biomes;
 import java.awt.Color;
 
 import com.kokakiwi.maths.generator.sample.params.HeightMap;
+import com.kokakiwi.maths.generator.world.Tile;
 import com.kokakiwi.maths.generator.world.WorldGenerator;
-import com.kokakiwi.maths.generator.world.gen.Biome;
+import com.kokakiwi.maths.generator.world.env.Biome;
 
 public class PlainBiome extends Biome
 {
@@ -13,14 +14,13 @@ public class PlainBiome extends Biome
     {
         super(generator);
     }
-
+    
     @Override
-    public boolean check(double x, double y)
+    public boolean check(double x, double y, double z, double precision)
     {
-        HeightMap heightmap = generator.getEnvironment().getParameter(HeightMap.class);
-        double h = heightmap.getValue(x, y);
+        double h = getValue(HeightMap.class, x, y, z);
         
-        if(h <= 0.7)
+        if (h <= (0.7 + precision))
         {
             return true;
         }
@@ -29,14 +29,10 @@ public class PlainBiome extends Biome
     }
     
     @Override
-    public Color getColor(double x, double y)
+    public void process(Tile tile)
     {
-        if (check(x, y))
-        {
-            return Color.green;
-        }
-        
-        return null;
+        tile.putProperty("biome", PlainBiome.class);
+        tile.putSingleProperty("color", Color.green);
     }
     
 }

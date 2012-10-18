@@ -24,6 +24,11 @@ public abstract class Parameter
         return noise;
     }
     
+    public double getValue(double x)
+    {
+        return getValue(x, 0.0);
+    }
+    
     public double getValue(double x, double y)
     {
         return getValue(x, y, 0.0);
@@ -31,20 +36,17 @@ public abstract class Parameter
     
     public double getValue(double x, double y, double z)
     {
-        if(this.value == -1.0)
+        if (value == -1.0)
         {
-            double value = value(x, y, z);
-            this.value = value;
-            
-            return value;
+            value = value(x, y, z);
         }
-
-        return this.value;
+        
+        return value;
     }
     
     public void reset()
     {
-        this.value = -1.0;
+        value = -1.0;
     }
     
     protected abstract double value(double x, double y, double z);

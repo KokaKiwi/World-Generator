@@ -3,8 +3,9 @@ package com.kokakiwi.maths.generator.sample.biomes;
 import java.awt.Color;
 
 import com.kokakiwi.maths.generator.sample.params.Temperature;
+import com.kokakiwi.maths.generator.world.Tile;
 import com.kokakiwi.maths.generator.world.WorldGenerator;
-import com.kokakiwi.maths.generator.world.gen.Biome;
+import com.kokakiwi.maths.generator.world.env.Biome;
 
 public class DesertBiome extends Biome
 {
@@ -13,14 +14,13 @@ public class DesertBiome extends Biome
     {
         super(generator);
     }
-
+    
     @Override
-    public boolean check(double x, double y)
+    public boolean check(double x, double y, double z, double precision)
     {
-        Temperature temperatures = generator.getEnvironment().getParameter(Temperature.class);
-        double t = temperatures.getValue(x, y);
+        double temperature = getValue(Temperature.class, x, y, z);
         
-        if(t > 60)
+        if (temperature > (60 + precision))
         {
             return true;
         }
@@ -29,14 +29,10 @@ public class DesertBiome extends Biome
     }
     
     @Override
-    public Color getColor(double x, double y)
+    public void process(Tile tile)
     {
-        if(check(x, y))
-        {
-            return Color.yellow;
-        }
-        
-        return null;
+        tile.putProperty("biome", DesertBiome.class);
+        tile.putSingleProperty("color", Color.yellow);
     }
     
 }

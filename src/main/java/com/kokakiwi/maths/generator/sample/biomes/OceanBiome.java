@@ -5,12 +5,13 @@ import java.awt.Color;
 import com.kokakiwi.maths.generator.sample.params.HeightMap;
 import com.kokakiwi.maths.generator.sample.params.Oasis;
 import com.kokakiwi.maths.generator.sample.params.Temperature;
+import com.kokakiwi.maths.generator.world.Tile;
 import com.kokakiwi.maths.generator.world.WorldGenerator;
-import com.kokakiwi.maths.generator.world.gen.Biome;
+import com.kokakiwi.maths.generator.world.env.Biome;
 
 public class OceanBiome extends Biome
 {
-    public final static double WATER_HEIGHT = 0.13;
+    public final static double WATER_HEIGHT = 0.41;
     
     public OceanBiome(WorldGenerator generator)
     {
@@ -18,22 +19,18 @@ public class OceanBiome extends Biome
     }
     
     @Override
-    public boolean check(double x, double y)
+    public boolean check(double x, double y, double z, double precision)
     {
-        HeightMap heightmap = generator.getEnvironment().getParameter(
-                HeightMap.class);
-        double h = heightmap.getValue(x, y);
-        Temperature temperatures = generator.getEnvironment().getParameter(
-                Temperature.class);
-        double temperature = temperatures.getValue(x, y);
-        double o = getValue(Oasis.class, x, y);
+        double h = getValue(HeightMap.class, x, y, z);
+        double temperature = getValue(Temperature.class, x, y, z);
+        double o = getValue(Oasis.class, x, y, z);
         
         if (h < WATER_HEIGHT)
         {
             return true;
         }
         
-        if (temperature > 65 && o > 0.5)
+        if (temperature > (65 + precision) && o > (0.6 + precision))
         {
             return true;
         }
@@ -42,14 +39,10 @@ public class OceanBiome extends Biome
     }
     
     @Override
-    public Color getColor(double x, double y)
+    public void process(Tile tile)
     {
-        if (check(x, y))
-        {
-            return Color.blue;
-        }
-        
-        return null;
+        tile.putProperty("biome", OceanBiome.class);
+        tile.putSingleProperty("color", Color.blue);
     }
     
 }

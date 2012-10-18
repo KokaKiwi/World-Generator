@@ -2,12 +2,10 @@ package com.kokakiwi.maths.generator.sample.biomes;
 
 import java.awt.Color;
 
-import com.kokakiwi.maths.generator.sample.params.HeightMap;
 import com.kokakiwi.maths.generator.sample.params.Rivers;
-import com.kokakiwi.maths.generator.sample.params.Temperature;
-import com.kokakiwi.maths.generator.sample.params.Volcano;
+import com.kokakiwi.maths.generator.world.Tile;
 import com.kokakiwi.maths.generator.world.WorldGenerator;
-import com.kokakiwi.maths.generator.world.gen.Biome;
+import com.kokakiwi.maths.generator.world.env.Biome;
 
 public class RiverBiome extends Biome
 {
@@ -16,16 +14,13 @@ public class RiverBiome extends Biome
     {
         super(generator);
     }
-
+    
     @Override
-    public boolean check(double x, double y)
+    public boolean check(double x, double y, double z, double precision)
     {
-        double height = getValue(HeightMap.class, x, y);
-        double r = getValue(Rivers.class, x, y);
-        double temperature = getValue(Temperature.class, x, y);
-        double volcano = getValue(Volcano.class, x, y);
+        double river = getValue(Rivers.class, x, y, z);
         
-        if(r < 0.2 && temperature < 55 && !(height > 0.75 && temperature < 55 && volcano > 0.7))
+        if (river <= (0.13 + precision))
         {
             return true;
         }
@@ -34,14 +29,10 @@ public class RiverBiome extends Biome
     }
     
     @Override
-    public Color getColor(double x, double y)
+    public void process(Tile tile)
     {
-        if(check(x, y))
-        {
-            return Color.cyan;
-        }
-        
-        return Color.black;
+        tile.putProperty("biome", RiverBiome.class);
+        tile.putSingleProperty("color", Color.cyan);
     }
     
 }

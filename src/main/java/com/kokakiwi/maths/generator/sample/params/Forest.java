@@ -2,12 +2,12 @@ package com.kokakiwi.maths.generator.sample.params;
 
 import com.kokakiwi.maths.generator.world.env.Parameter;
 
-public class HeightMap extends Parameter
+public class Forest extends Parameter
 {
     
-    public HeightMap(String seed)
+    public Forest(String seed)
     {
-        super("heightmap", seed, 123244);
+        super("forest", seed, 1115221652);
     }
     
     @Override
@@ -15,8 +15,8 @@ public class HeightMap extends Parameter
     {
         double result = 0.0;
         
-        result += noise.fBm(0.0009 * x, 0.0009 * y, 0.0009 * z, 6, 2.3544,
-                1.0) + 0.4; //1.422561
+        result += noise.fBm(0.0009 * x, 0.0009 * y, 0.0009 * z, 5, 2.2351,
+                1.422561) + 0.4;
         
         return result;
     }
